@@ -44,12 +44,25 @@
             margin: 30px 0;
             text-align: left;
         }
-        .order-info p { margin: 8px 0; color: #666; }
+        .order-info p { margin: 8px 0; color: #666; display: flex; justify-content: space-between; }
         .order-info strong { color: #333; }
-        .next-steps {
-            text-align: left;
+        .activation-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
             margin: 30px 0;
         }
+        .activation-code h3 { margin-bottom: 10px; }
+        .activation-code code {
+            font-size: 1.5em;
+            letter-spacing: 3px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .next-steps { text-align: left; margin: 30px 0; }
         .next-steps h3 { color: #333; margin-bottom: 15px; }
         .next-steps ul { list-style: none; }
         .next-steps li { padding: 8px 0; color: #666; }
@@ -83,35 +96,80 @@
         
         <div class="order-info">
             <p><strong>订单号：</strong><span id="order-id">-</span></p>
-            <p><strong>订阅方案：</strong>专业版 (月付)</p>
-            <p><strong>金额：</strong>¥99.00 CNY</p>
-            <p><strong>状态：</strong><span style="color: #4CAF50;">已激活</span></p>
+            <p><strong>订阅方案：</strong><span id="plan-type">专业版 (月付)</span></p>
+            <p><strong>金额：</strong><span id="amount">$14.00 USD</span></p>
+            <p><strong>状态：</strong><span style="color: #4CAF50;">✅ 已激活</span></p>
+            <p><strong>有效期：</strong><span id="expiry">-</span></p>
+        </div>
+        
+        <div class="activation-code">
+            <h3>🔑 您的激活码</h3>
+            <code id="activation-code">-</code>
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">请保存此激活码，用于激活专业版</p>
         </div>
         
         <div class="next-steps">
             <h3>📋 下一步：</h3>
             <ul>
-                <li>确认邮件已发送到您的邮箱</li>
-                <li>登录即可享受无限生成</li>
-                <li>查看高级模板和导出功能</li>
+                <li>确认邮件已发送到您的 PayPal 邮箱</li>
+                <li>使用激活码在工具中激活专业版</li>
+                <li>开始享受无限生成和高级功能</li>
             </ul>
         </div>
         
-        <a href="https://ai-tools-hub.vercel.app" class="cta-btn">
-            开始使用 →
-        </a>
+        <a href="https://ai-tools-hub.vercel.app" class="cta-btn">开始使用 →</a>
         
         <div class="support">
             <p>如有问题，请联系：haotony@hotmail.com</p>
+            <p>或添加微信：注明"AI Tools"</p>
         </div>
     </div>
     
     <script>
-        // 从URL获取订单ID
+        // 从URL获取订单信息
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('order_id') || urlParams.get('subscription_id');
-        if (orderId) {
-            document.getElementById('order-id').textContent = orderId;
+        const orderId = urlParams.get('order_id') || 'N/A';
+        const plan = urlParams.get('plan') || 'monthly';
+        
+        // 显示订单信息
+        document.getElementById('order-id').textContent = orderId;
+        
+        if (plan === 'yearly') {
+            document.getElementById('plan-type').textContent = '专业版 (年付)';
+            document.getElementById('amount').textContent = '$140.00 USD';
+        }
+        
+        // 计算有效期
+        const now = new Date();
+        const expiry = new Date(now);
+        if (plan === 'yearly') {
+            expiry.setFullYear(expiry.getFullYear() + 1);
+        } else {
+            expiry.setMonth(expiry.getMonth() + 1);
+        }
+        document.getElementById('expiry').textContent = expiry.toLocaleDateString('zh-CN');
+        
+        // 生成激活码 (基于订单ID)
+        function generateActivationCode(orderId) {
+            // 简单的激活码生成算法
+            const hash = orderId.split('').reduce((a, b) => {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a & a;
+            }, 0);
+            const code = Math.abs(hash).toString(36).toUpperCase();
+            return 'AI-' + code.padStart(8, 'X').substring(0, 8);
+        }
+        
+        const activationCode = generateActivationCode(orderId);
+        document.getElementById('activation-code').textContent = activationCode;
+        
+        // 保存到 localStorage
+        const savedOrder = localStorage.getItem('paypal_order');
+        if (savedOrder) {
+            const orderData = JSON.parse(savedOrder);
+            orderData.activationCode = activationCode;
+            orderData.expiry = expiry.toISOString();
+            localStorage.setItem('paypal_order', JSON.stringify(orderData));
         }
     </script>
 </body>

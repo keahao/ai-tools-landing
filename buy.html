@@ -26,19 +26,9 @@
             color: #333;
             box-shadow: 0 30px 80px rgba(0,0,0,0.3);
         }
-        .logo {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-        .pay-card h1 { 
-            font-size: 1.8em;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        .pay-card .subtitle {
-            color: #666;
-            margin-bottom: 20px;
-        }
+        .logo { font-size: 3em; margin-bottom: 10px; }
+        .pay-card h1 { font-size: 1.8em; margin-bottom: 5px; color: #333; }
+        .pay-card .subtitle { color: #666; margin-bottom: 20px; }
         .pay-card .price {
             font-size: 3.5em;
             font-weight: bold;
@@ -67,23 +57,9 @@
             gap: 12px;
             font-size: 1.05em;
         }
-        .features li::before { 
-            content: "✓"; 
-            color: #4CAF50; 
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        #paypal-button-container {
-            margin-top: 30px;
-            min-height: 55px;
-        }
-        .back-link {
-            display: block;
-            margin-top: 30px;
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
+        .features li::before { content: "✓"; color: #4CAF50; font-weight: bold; font-size: 1.2em; }
+        #paypal-button-container { margin-top: 30px; min-height: 55px; }
+        .back-link { display: block; margin-top: 30px; color: #666; text-decoration: none; font-size: 0.9em; }
         .note {
             margin-top: 25px;
             padding: 18px;
@@ -93,12 +69,7 @@
             color: #2e7d32;
             line-height: 1.6;
         }
-        .toggle-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
+        .toggle-container { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
         .toggle-btn {
             padding: 10px 25px;
             border: 2px solid #667eea;
@@ -107,15 +78,14 @@
             cursor: pointer;
             font-size: 1em;
             transition: all 0.3s;
+            color: #333;
         }
         .toggle-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
         }
-        .toggle-btn:hover {
-            opacity: 0.8;
-        }
+        .toggle-btn:hover { opacity: 0.8; }
         .yearly-save {
             background: #4CAF50;
             color: white;
@@ -123,27 +93,6 @@
             border-radius: 10px;
             font-size: 0.75em;
             margin-left: 5px;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .loading.active {
-            display: block;
-        }
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -160,7 +109,7 @@
             </button>
         </div>
         
-        <div class="price" id="price-display">$14<small>/月</small></div>
+        <div class="price" id="price-display">$14<small>/月 (约¥99)</small></div>
         
         <ul class="features">
             <li>无限次生成报告</li>
@@ -173,11 +122,6 @@
         
         <div id="paypal-button-container"></div>
         
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>正在处理支付...</p>
-        </div>
-        
         <p class="note">
             💳 支持信用卡、借记卡、PayPal余额<br>
             🔒 支付安全由 PayPal 保障<br>
@@ -187,32 +131,21 @@
         <a href="https://ai-tools-hub.vercel.app" class="back-link">← 返回首页</a>
     </div>
     
-    <!-- PayPal SDK - 订阅模式 -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD&intent=subscription&vault=true"></script>
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD"></script>
     
     <script>
-        // 订阅计划 ID (需要先运行 create-plan.js 创建)
-        const PLANS = {
-            monthly: 'P-xxxxxxxxxx',  // 月付计划ID - 需要替换
-            yearly: 'P-xxxxxxxxxx'   // 年付计划ID - 需要替换
-        };
-        
         let currentPlan = 'monthly';
+        const prices = {
+            monthly: { amount: '14.00', label: '$14<small>/月 (约¥99)</small>' },
+            yearly: { amount: '140.00', label: '$140<small>/年 (约¥990)</small>' }
+        };
         
         function setPlan(type) {
             currentPlan = type;
-            
-            // 更新按钮状态
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // 更新价格显示
-            const priceDisplay = document.getElementById('price-display');
-            if (type === 'monthly') {
-                priceDisplay.innerHTML = '$14<small>/月</small>';
-            } else {
-                priceDisplay.innerHTML = '$140<small>/年 (约$12/月)</small>';
-            }
+            document.getElementById('price-display').innerHTML = prices[type].label;
             
             // 重新渲染 PayPal 按钮
             document.getElementById('paypal-button-container').innerHTML = '';
@@ -225,40 +158,48 @@
                     shape: 'rect',
                     color: 'gold',
                     layout: 'vertical',
-                    label: 'subscribe',
+                    label: 'pay',
                     height: 55
                 },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        plan_id: PLANS[currentPlan]
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: currentPlan === 'monthly' 
+                                ? 'AI Tools Suite - 专业版 (月付)' 
+                                : 'AI Tools Suite - 专业版 (年付)',
+                            amount: {
+                                currency_code: 'USD',
+                                value: prices[currentPlan].amount
+                            }
+                        }],
+                        application_context: {
+                            shipping_preference: 'NO_SHIPPING',
+                            brand_name: 'AI Tools Suite',
+                            locale: 'zh-CN'
+                        }
                     });
                 },
                 onApprove: function(data, actions) {
-                    console.log('订阅成功:', data);
-                    document.getElementById('loading').classList.add('active');
-                    
-                    // 验证订阅
-                    fetch(`/api/verify-payment?subscription_id=${data.subscriptionID}`)
-                        .then(res => res.json())
-                        .then(result => {
-                            if (result.success) {
-                                window.location.href = `success.html?subscription_id=${data.subscriptionID}`;
-                            } else {
-                                alert('订阅验证失败，请联系客服');
-                            }
-                        })
-                        .catch(err => {
-                            console.error('验证错误:', err);
-                            // 即使验证失败也跳转成功页（PayPal已确认）
-                            window.location.href = `success.html?subscription_id=${data.subscriptionID}`;
-                        });
+                    return actions.order.capture().then(function(details) {
+                        console.log('支付成功:', details);
+                        // 保存订单信息到 localStorage
+                        localStorage.setItem('paypal_order', JSON.stringify({
+                            orderID: data.orderID,
+                            plan: currentPlan,
+                            amount: prices[currentPlan].amount,
+                            payer: details.payer,
+                            time: new Date().toISOString()
+                        }));
+                        // 跳转成功页
+                        window.location.href = 'success.html?order_id=' + data.orderID + '&plan=' + currentPlan;
+                    });
                 },
                 onError: function(err) {
                     console.error('PayPal错误:', err);
-                    alert('支付出现问题，请稍后重试\n\n如需帮助：haotony@hotmail.com');
+                    alert('支付出现问题，请稍后重试\n\n如需帮助请联系：haotony@hotmail.com');
                 },
                 onCancel: function(data) {
-                    console.log('用户取消:', data);
+                    console.log('用户取消支付');
                 }
             }).render('#paypal-button-container');
         }
