@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付成功 - AI Tools Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .success-card {
+            background: white;
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+        }
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+            color: white;
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        .order-info {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .order-info p { margin: 8px 0; color: #666; }
+        .order-info strong { color: #333; }
+        .next-steps {
+            text-align: left;
+            margin: 30px 0;
+        }
+        .next-steps h3 { color: #333; margin-bottom: 15px; }
+        .next-steps ul { list-style: none; }
+        .next-steps li { padding: 8px 0; color: #666; }
+        .next-steps li::before { content: "→ "; color: #667eea; }
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .cta-btn:hover { opacity: 0.9; }
+        .support {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="checkmark">✓</div>
+        <h1>支付成功！</h1>
+        <p class="subtitle">感谢您订阅 AI Tools Suite 专业版</p>
+        
+        <div class="order-info">
+            <p><strong>订单号：</strong><span id="order-id">-</span></p>
+            <p><strong>订阅方案：</strong>专业版 (月付)</p>
+            <p><strong>金额：</strong>¥99.00 CNY</p>
+            <p><strong>状态：</strong><span style="color: #4CAF50;">已激活</span></p>
+        </div>
+        
+        <div class="next-steps">
+            <h3>📋 下一步：</h3>
+            <ul>
+                <li>确认邮件已发送到您的邮箱</li>
+                <li>登录即可享受无限生成</li>
+                <li>查看高级模板和导出功能</li>
+            </ul>
+        </div>
+        
+        <a href="https://ai-tools-hub.vercel.app" class="cta-btn">
+            开始使用 →
+        </a>
+        
+        <div class="support">
+            <p>如有问题，请联系：haotony@hotmail.com</p>
+        </div>
+    </div>
+    
+    <script>
+        // 从URL获取订单ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id') || urlParams.get('subscription_id');
+        if (orderId) {
+            document.getElementById('order-id').textContent = orderId;
+        }
+    </script>
+</body>
+</html>

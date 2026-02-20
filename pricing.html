@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools Suite - 升级专业版</title>
+    <meta name="description" content="升级AI Tools专业版，解锁无限生成、高级功能、优先支持">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
+        
+        .pricing-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 30px; 
+            margin-top: 40px;
+        }
+        
+        .plan {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .plan:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+        
+        .plan.popular {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 2px solid #667eea;
+            position: relative;
+        }
+        .plan.popular::before {
+            content: "🔥 最受欢迎";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        
+        .plan h3 { font-size: 1.5em; margin-bottom: 10px; }
+        .plan .price { 
+            font-size: 3em; 
+            font-weight: bold; 
+            margin: 20px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .plan .price span { font-size: 0.4em; color: rgba(255,255,255,0.5); }
+        
+        .plan ul { 
+            list-style: none; 
+            text-align: left; 
+            margin: 30px 0;
+        }
+        .plan ul li { 
+            padding: 10px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .plan ul li::before { content: "✓"; color: #4CAF50; }
+        
+        .buy-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        .buy-btn:hover { transform: scale(1.02); }
+        
+        .buy-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .buy-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .free-plan {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+        .free-plan .price { font-size: 2em; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: rgba(255,255,255,0.5);
+        }
+        .footer a { color: #667eea; }
+        
+        /* PayPal Button Container */
+        .paypal-container {
+            margin-top: 20px;
+            min-height: 50px;
+        }
+        
+        .guarantee {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .guarantee span { font-size: 1.5em; margin-right: 10px; }
+        
+        #paypal-pro, #paypal-enterprise { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 升级专业版</h1>
+        <p class="subtitle">解锁无限生成 · 高级功能 · 优先支持</p>
+        
+        <div class="pricing-grid">
+            <!-- 免费版 -->
+            <div class="plan free-plan">
+                <h3>🆓 免费版</h3>
+                <div class="price">¥0<span>/永久</span></div>
+                <ul>
+                    <li>每日5次生成</li>
+                    <li>基础报告模板</li>
+                    <li>标准输出质量</li>
+                    <li>社区支持</li>
+                </ul>
+                <a href="https://ai-tools-hub.vercel.app" class="buy-btn secondary">免费使用</a>
+            </div>
+            
+            <!-- 专业版 -->
+            <div class="plan popular" id="pro-plan">
+                <h3>⚡ 专业版</h3>
+                <div class="price">¥99<span>/月</span></div>
+                <ul>
+                    <li>无限次生成</li>
+                    <li>所有高级模板</li>
+                    <li>最高输出质量</li>
+                    <li>导出 Word/PDF</li>
+                    <li>优先技术支持</li>
+                    <li>API 访问权限</li>
+                </ul>
+                <button class="buy-btn primary" onclick="showPayPalPro()">
+                    立即订阅
+                </button>
+                <div id="paypal-pro" class="paypal-container"></div>
+            </div>
+            
+            <!-- 企业版 -->
+            <div class="plan" id="enterprise-plan">
+                <h3>🏢 企业版</h3>
+                <div class="price">¥999<span>/月</span></div>
+                <ul>
+                    <li>专业版全部功能</li>
+                    <li>团队协作 (10人)</li>
+                    <li>私有部署支持</li>
+                    <li>定制化开发</li>
+                    <li>专属客户经理</li>
+                    <li>SLA 保障</li>
+                </ul>
+                <button class="buy-btn secondary" onclick="showPayPalEnterprise()">
+                    联系我们
+                </button>
+                <div id="paypal-enterprise" class="paypal-container"></div>
+            </div>
+        </div>
+        
+        <div class="guarantee">
+            <span>🔒</span>
+            <strong>7天无理由退款</strong> · 不满意全额退款，无需任何理由
+        </div>
+        
+        <div class="footer">
+            <p>支付安全由 PayPal 保障 | <a href="https://ai-tools-hub.vercel.app">返回首页</a></p>
+            <p style="margin-top: 10px;">支持信用卡、借记卡、PayPal余额支付</p>
+        </div>
+    </div>
+    
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD&intent=subscription"></script>
+    
+    <script>
+        // 汇率转换 (CNY to USD, 约 1:0.14)
+        const CNY_TO_USD = 0.14;
+        
+        // 专业版订阅按钮
+        function showPayPalPro() {
+            document.getElementById('paypal-pro').style.display = 'block';
+            document.querySelector('#pro-plan .buy-btn').style.display = 'none';
+            
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'blue',
+                    layout: 'vertical',
+                    label: 'subscribe'
+                },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': 'PRO_PLAN_ID', // 需要在PayPal创建订阅计划后替换
+                        'subscriber': {
+                            'name': {
+                                'given_name': '',
+                                'surname': ''
+                            },
+                            'email_address': ''
+                        }
+                    });
+                },
+                onApprove: function(data, actions) {
+                    alert('订阅成功！订阅ID: ' + data.subscriptionID);
+                    // 这里可以跳转到成功页面或发送到后端验证
+                    window.location.href = '/success.html?subscription_id=' + data.subscriptionID;
+                },
+                onError: function(err) {
+                    console.error('PayPal错误:', err);
+                    alert('支付失败，请稍后重试');
+                }
+            }).render('#paypal-pro');
+        }
+        
+        // 企业版 - 一次性付款 (或跳转联系)
+        function showPayPalEnterprise() {
+            // 企业版建议联系销售
+            alert('企业版需要定制方案，请联系我们：\n\n📧 Email: haotony@hotmail.com\n📱 PayPal: haotony@hotmail.com');
+        }
+        
+        // 备选：一次性付款按钮（如果不用订阅）
+        function renderOneTimePayment() {
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'pay'
+                },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: 'AI Tools Suite - 专业版 (月付)',
+                            amount: {
+                                currency_code: 'USD',
+                                value: '14.00' // ¥99 ≈ $14 USD
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert('支付成功！感谢 ' + details.payer.name.given_name);
+                        window.location.href = '/success.html?order_id=' + data.orderID;
+                    });
+                }
+            }).render('#paypal-buttons');
+        }
+    </script>
+</body>
+</html>

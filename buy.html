@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购买专业版 - AI Tools Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        .pay-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            color: #333;
+        }
+        .pay-card h1 { 
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .pay-card .price {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        .pay-card .price small {
+            font-size: 0.4em;
+            color: #999;
+        }
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .features li {
+            padding: 8px 0;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .features li::before { content: "✓"; color: #4CAF50; font-weight: bold; }
+        #paypal-button-container {
+            margin-top: 30px;
+            min-height: 50px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="pay-card">
+        <h1>⚡ AI Tools 专业版</h1>
+        <div class="price">$14<small>/月 (约¥99)</small></div>
+        
+        <ul class="features">
+            <li>无限次生成报告</li>
+            <li>所有高级模板</li>
+            <li>导出 Word/PDF</li>
+            <li>优先技术支持</li>
+            <li>API 访问权限</li>
+        </ul>
+        
+        <div id="paypal-button-container"></div>
+        
+        <p class="note">
+            💳 支持信用卡、借记卡、PayPal余额<br>
+            🔒 支付安全由 PayPal 保障
+        </p>
+        
+        <a href="https://ai-tools-hub.vercel.app" class="back-link">← 返回首页</a>
+    </div>
+    
+    <!-- PayPal SDK - 使用生产环境 Client ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD"></script>
+    
+    <script>
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'pay',
+                height: 50
+            },
+            // 创建订单
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        description: 'AI Tools Suite - 专业版 (月付)',
+                        amount: {
+                            currency_code: 'USD',
+                            value: '14.00'
+                        }
+                    }],
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING'
+                    }
+                });
+            },
+            // 支付成功
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    console.log('支付成功:', details);
+                    // 跳转到成功页面
+                    window.location.href = 'success.html?order_id=' + data.orderID;
+                });
+            },
+            // 支付失败
+            onError: function(err) {
+                console.error('PayPal Error:', err);
+                alert('支付出现问题，请稍后重试。\n\n如需帮助请联系：haotony@hotmail.com');
+            },
+            // 用户取消
+            onCancel: function(data) {
+                alert('支付已取消。您可以随时重新购买。');
+            }
+        }).render('#paypal-button-container');
+    </script>
+</body>
+</html>
