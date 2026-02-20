@@ -94,6 +94,14 @@
             font-size: 0.75em;
             margin-left: 5px;
         }
+        .login-prompt {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .login-prompt a { color: #667eea; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -117,82 +125,102 @@
             <li>导出 Word/PDF/Excel</li>
             <li>优先技术支持</li>
             <li>API 访问权限</li>
-            <li>7天无理由退款</li>
+            <li>自动续费，随时取消</li>
         </ul>
+
+        <div id="login-prompt" class="login-prompt hidden">
+            💡 <a href="dashboard.html">登录账号</a> 后订阅可享受完整管理功能
+        </div>
         
         <div id="paypal-button-container"></div>
         
         <p class="note">
             💳 支持信用卡、借记卡、PayPal余额<br>
             🔒 支付安全由 PayPal 保障<br>
-            📧 确认邮件将发送至您的邮箱
+            🔄 自动续费，随时可取消
         </p>
         
         <a href="https://ai-tools-hub.vercel.app" class="back-link">← 返回首页</a>
     </div>
     
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD"></script>
+    <!-- PayPal SDK - 订阅模式 -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcwlL1zVZtCS4EUKLXxK8jfphMnFplDJvokbxR2PjPZI_P1jOgB0tI9sZSwpT8hJO4VUxz_ZIv_Z0Duu&currency=USD&intent=subscription&vault=true"></script>
     
     <script>
-        let currentPlan = 'monthly';
+        // PayPal 订阅计划 ID（需要先运行 /api/paypal/create-plan 创建）
+        // 这里先用占位符，实际部署后需要替换
+        const PLANS = {
+            monthly: 'P-5YQ71517GY946113NMG5L3QA',  // 月付计划ID
+            yearly: 'P-6XR82628HZ0572243NM5L3RI'   // 年付计划ID
+        };
+        
         const prices = {
             monthly: { amount: '14.00', label: '$14<small>/月 (约¥99)</small>' },
             yearly: { amount: '140.00', label: '$140<small>/年 (约¥990)</small>' }
         };
         
+        let currentPlan = 'monthly';
+        let token = localStorage.getItem('token');
+
+        // 检查登录状态
+        if (!token) {
+            document.getElementById('login-prompt').classList.remove('hidden');
+        }
+
         function setPlan(type) {
             currentPlan = type;
-            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.toggle-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (i === 0 && type === 'monthly') || (i === 1 && type === 'yearly'));
+            });
             document.getElementById('price-display').innerHTML = prices[type].label;
             
             // 重新渲染 PayPal 按钮
             document.getElementById('paypal-button-container').innerHTML = '';
             renderPayPalButtons();
         }
-        
+
         function renderPayPalButtons() {
             paypal.Buttons({
                 style: {
                     shape: 'rect',
                     color: 'gold',
                     layout: 'vertical',
-                    label: 'pay',
+                    label: 'subscribe',
                     height: 55
                 },
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            description: currentPlan === 'monthly' 
-                                ? 'AI Tools Suite - 专业版 (月付)' 
-                                : 'AI Tools Suite - 专业版 (年付)',
-                            amount: {
-                                currency_code: 'USD',
-                                value: prices[currentPlan].amount
-                            }
-                        }],
-                        application_context: {
-                            shipping_preference: 'NO_SHIPPING',
-                            brand_name: 'AI Tools Suite',
-                            locale: 'zh-CN'
-                        }
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        plan_id: PLANS[currentPlan]
                     });
                 },
                 onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        console.log('支付成功:', details);
-                        // 保存订单信息到 localStorage
-                        localStorage.setItem('paypal_order', JSON.stringify({
-                            orderID: data.orderID,
-                            plan: currentPlan,
-                            amount: prices[currentPlan].amount,
-                            payer: details.payer,
-                            time: new Date().toISOString()
-                        }));
-                        // 跳转成功页
-                        window.location.href = 'success.html?order_id=' + data.orderID + '&plan=' + currentPlan;
-                    });
+                    console.log('订阅成功:', data);
+                    
+                    // 保存订阅信息
+                    const subscriptionData = {
+                        subscriptionID: data.subscriptionID,
+                        plan: currentPlan,
+                        time: new Date().toISOString()
+                    };
+                    localStorage.setItem('paypal_subscription', JSON.stringify(subscriptionData));
+                    
+                    // 如果已登录，通知服务器
+                    if (token) {
+                        fetch('/api/subscription/activate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                subscription_id: data.subscriptionID,
+                                plan: currentPlan
+                            })
+                        }).catch(err => console.error('激活失败:', err));
+                    }
+                    
+                    // 跳转成功页
+                    window.location.href = `success.html?subscription_id=${data.subscriptionID}&plan=${currentPlan}`;
                 },
                 onError: function(err) {
                     console.error('PayPal错误:', err);
@@ -203,7 +231,7 @@
                 }
             }).render('#paypal-button-container');
         }
-        
+
         // 初始渲染
         renderPayPalButtons();
     </script>

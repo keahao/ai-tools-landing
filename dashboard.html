@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户面板 - AI Tools Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 1.8em; }
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .card h2 { font-size: 1.3em; margin-bottom: 20px; }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .status-item {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .status-item .value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status-item .label {
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+        .plan-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .plan-free { background: #666; }
+        .plan-pro { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .plan-cancelled { background: #f44336; }
+        .upgrade-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .upgrade-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .cancel-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1em;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+        }
+        .switch-link a { color: #667eea; }
+        .error-msg {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录/注册表单 -->
+        <div id="auth-section" class="login-form">
+            <div id="login-form">
+                <h2 style="text-align: center; margin-bottom: 30px;">登录 AI Tools</h2>
+                <div id="login-error" class="error-msg hidden"></div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="login-email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="login-password" placeholder="••••••">
+                </div>
+                <button class="submit-btn" onclick="login()">登录</button>
+                <p class="switch-link">还没有账号？<a href="#" onclick="showRegister()">立即注册</a></p>
+            </div>
+
+            <div id="register-form" class="hidden">
+                <h2 style="text-align: center; margin-bottom: 30px;">注册 AI Tools</h2>
+                <div id="register-error" class="error-msg hidden"></div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="register-email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>姓名（可选）</label>
+                    <input type="text" id="register-name" placeholder="您的名字">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="register-password" placeholder="至少6位">
+                </div>
+                <button class="submit-btn" onclick="register()">注册</button>
+                <p class="switch-link">已有账号？<a href="#" onclick="showLogin()">立即登录</a></p>
+            </div>
+        </div>
+
+        <!-- 用户面板 -->
+        <div id="dashboard-section" class="hidden">
+            <div class="header">
+                <h1>👋 欢迎，<span id="user-name">用户</span></h1>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+
+            <div class="card">
+                <h2>订阅状态</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="value"><span id="plan-badge" class="plan-badge plan-free">免费版</span></div>
+                        <div class="label">当前方案</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="value" id="usage-count">0</div>
+                        <div class="label">使用次数</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="value" id="expiry-date">-</div>
+                        <div class="label">到期时间</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 免费用户升级提示 -->
+            <div id="upgrade-section" class="card upgrade-section">
+                <h2>升级专业版</h2>
+                <p style="color: rgba(255,255,255,0.7); margin-top: 10px;">解锁无限生成、高级功能、优先支持</p>
+                <a href="buy.html" class="upgrade-btn">⚡ 升级专业版 $14/月 →</a>
+            </div>
+
+            <!-- 专业用户管理 -->
+            <div id="subscription-section" class="card hidden">
+                <h2>订阅管理</h2>
+                <p style="color: rgba(255,255,255,0.7);">订阅ID: <span id="subscription-id">-</span></p>
+                <p style="color: rgba(255,255,255,0.7); margin-top: 10px;">付款邮箱: <span id="paypal-email">-</span></p>
+                <button class="cancel-btn" onclick="cancelSubscription()">取消订阅</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let token = localStorage.getItem('token');
+
+        // 检查登录状态
+        if (token) {
+            loadDashboard();
+        }
+
+        function showLogin() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+
+            if (!email || !password) {
+                errorEl.textContent = '请填写邮箱和密码';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errorEl.textContent = data.error || '登录失败';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                token = data.token;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                loadDashboard();
+
+            } catch (error) {
+                errorEl.textContent = '网络错误，请重试';
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const name = document.getElementById('register-name').value;
+            const errorEl = document.getElementById('register-error');
+
+            if (!email || !password) {
+                errorEl.textContent = '请填写邮箱和密码';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = '密码至少6位';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, name })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errorEl.textContent = data.error || '注册失败';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                token = data.token;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                loadDashboard();
+
+            } catch (error) {
+                errorEl.textContent = '网络错误，请重试';
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        async function loadDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/subscription/status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    logout();
+                    return;
+                }
+
+                // 更新界面
+                document.getElementById('user-name').textContent = data.user.name || data.user.email;
+                document.getElementById('usage-count').textContent = data.usage.total;
+
+                // 订阅状态
+                const planBadge = document.getElementById('plan-badge');
+                if (data.subscription.plan === 'pro') {
+                    planBadge.textContent = '专业版';
+                    planBadge.className = 'plan-badge plan-pro';
+                    document.getElementById('upgrade-section').classList.add('hidden');
+                    document.getElementById('subscription-section').classList.remove('hidden');
+                    document.getElementById('subscription-id').textContent = data.subscription.subscription_id || '-';
+                    document.getElementById('paypal-email').textContent = data.subscription.paypal_email || '-';
+                } else if (data.subscription.plan === 'cancelled') {
+                    planBadge.textContent = '已取消';
+                    planBadge.className = 'plan-badge plan-cancelled';
+                } else {
+                    planBadge.textContent = '免费版';
+                    planBadge.className = 'plan-badge plan-free';
+                }
+
+                // 到期时间
+                if (data.subscription.subscription_end) {
+                    const expiry = new Date(data.subscription.subscription_end);
+                    document.getElementById('expiry-date').textContent = expiry.toLocaleDateString('zh-CN');
+                } else {
+                    document.getElementById('expiry-date').textContent = '-';
+                }
+
+            } catch (error) {
+                console.error('加载面板失败:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            token = null;
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+        }
+
+        function cancelSubscription() {
+            if (confirm('确定要取消订阅吗？当前周期的功能仍可使用至到期。')) {
+                alert('请前往 PayPal 取消订阅，或联系客服：haotony@hotmail.com');
+            }
+        }
+    </script>
+</body>
+</html>
