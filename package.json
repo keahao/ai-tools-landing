@@ -1,0 +1,11 @@
+{
+  "name": "ai-tools-landing",
+  "version": "1.0.0",
+  "scripts": {
+    "create-plan": "node api/create-plan.js",
+    "verify-payment": "node api/verify-payment.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
